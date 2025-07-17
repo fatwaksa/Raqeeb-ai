@@ -11,9 +11,23 @@ const tajawal = Tajawal({
 })
 
 export const metadata: Metadata = {
-  title: "Media Analysis Platform",
-  description: "Analyze images, videos, audio, and links.",
-    generator: 'v0.dev'
+  title: "Raqeeb", // Updated title for PWA
+  description: "A modern media analysis platform.", // Updated description for PWA
+  generator: "v0.dev",
+  manifest: "/manifest.json", // Link to manifest file
+  themeColor: "#00ff99", // Theme color for PWA
+  appleWebApp: {
+    // Apple specific PWA settings
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Raqeeb",
+    startupImage: [
+      "/raqeeb-icon-512x512.png", // Placeholder for splash screen image
+    ],
+  },
+  formatDetection: {
+    telephone: false,
+  },
 }
 
 export default function RootLayout({
@@ -21,12 +35,29 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  // Default to Arabic (RTL) based on user's primary language in prompt
-  const isArabic = true // This would typically come from a global state or context
+  const isArabic = true
   const dir = isArabic ? "rtl" : "ltr"
 
   return (
     <html lang={isArabic ? "ar" : "en"} dir={dir} suppressHydrationWarning>
+      <head>
+        {/* Service Worker Registration */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                  navigator.serviceWorker.register('/service-worker.js').then(function(registration) {
+                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                  }, function(err) {
+                    console.log('ServiceWorker registration failed: ', err);
+                  });
+                });
+              }
+            `,
+          }}
+        />
+      </head>
       <body className={`${tajawal.variable} font-sans bg-black text-white`}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
           {children}
